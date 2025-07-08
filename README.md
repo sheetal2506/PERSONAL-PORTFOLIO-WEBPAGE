@@ -60,7 +60,9 @@ Responsiveness
 I added media queries to ensure the page adapts gracefully across different devices. On smaller screens, the layout shifts to single-column mode, text sizes decrease, and spacing is adjusted for readability and usability.
 
 Conclusion
-This portfolio site demonstrates my skills not just in coding and UI design, but also in crafting a coherent, polished user experience. It serves as a central hub to showcase my projects, connect with potential employers or collaborators, and reflect my personality as a developer. The result is a minimal, effective, and highly responsive portfolio that is easy to navigate and visually compelling—built entirely with native web technologies
+This portfolio site demonstrates my skills not just in coding and UI design, but also in crafting a coherent, polished user experience. It serves as a central hub to showcase my projects, connect with potential employers or collaborators, and reflect my personality as a developer. The result is a minimal, effective, and highly responsive portfolio that is easy to navigate and visually compelling—built entirely with native web technologies.
+
+#Output
 
 <img width="1289" height="548" alt="Image" src="https://github.com/user-attachments/assets/e0773fe4-b92b-4c92-ae67-5a6a6e4d974a" />
 <img width="1283" height="567" alt="Image" src="https://github.com/user-attachments/assets/61f8a168-3164-4960-84e5-2f99c101d9fd" />
