@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Payment Gateway</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .payment-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 600px;
+            width: 100%;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .payment-header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .payment-header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .amount-display {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .payment-body {
+            padding: 30px;
+        }
+
+        .payment-methods {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .payment-method {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .payment-method:hover {
+            border-color: #4facfe;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.2);
+        }
+
+        .payment-method.active {
+            border-color: #4facfe;
+            background: linear-gradient(135deg, #4facfe10, #00f2fe10);
+        }
+
+        .payment-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .upi-icon { background: #ff6b35; }
+        .qr-icon { background: #4ecdc4; }
+        .bank-icon { background: #45b7d1; }
+
+        .payment-details {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #4facfe;
+        }
+
+        .payment-details.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .qr-code-container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            font-size: 4rem;
+            color: #666;
+        }
+
+        .pay-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .pay-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(79, 172, 254, 0.4);
+        }
+
+        .pay-button:active {
+            transform: translateY(0);
+        }
+
+        .pay-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .security-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4facfe;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .payment-container {
+                margin: 10px;
+            }
+            
+            .payment-header {
+                padding: 20px;
+            }
+            
+            .amount-display {
+                font-size: 2rem;
+            }
+            
+            .payment-body {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <div class="payment-header">
+            <h1>🔒 Secure Payment</h1>
+            <div class="amount-display">₹1,299.00</div>
+            <p>Complete your payment securely</p>
+        </div>
+
+        <div class="payment-body">
+            <div class="payment-methods">
+                <div class="payment-method" data-method="upi">
+                    <div class="payment-icon upi-icon">📱</div>
+                    <div>
+                        <h3>UPI Payment</h3>
+                        <p>Pay using your UPI ID or mobile number</p>
+                    </div>
+                </div>
+
+                <div class="payment-method" data-method="qr">
+                    <div class="payment-icon qr-icon">📊</div>
+                    <div>
+                        <h3>Scan QR Code</h3>
+                        <p>Scan with any UPI app to pay instantly</p>
+                    </div>
+                </div>
+
+                <div class="payment-method" data-method="netbanking">
+                    <div class="payment-icon bank-icon">🏦</div>
+                    <div>
+                        <h3>Net Banking</h3>
+                        <p>Pay directly from your bank account</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- UPI Payment Details -->
+            <div class="payment-details" id="upi-details">
+                <h4>Enter UPI Details</h4>
+                <div class="form-group">
+                    <label for="upi-id">UPI ID</label>
+                    <input type="text" id="upi-id" placeholder="yourname@paytm" maxlength="50">
+                </div>
+                <div class="form-group">
+                    <label for="mobile">Mobile Number (Optional)</label>
+                    <input type="tel" id="mobile" placeholder="9876543210" maxlength="10">
+                </div>
+            </div>
+
+            <!-- QR Code Details -->
+            <div class="payment-details" id="qr-details">
+                <div class="qr-code-container">
+                    <div class="qr-code">📱</div>
+                    <h4>Scan QR Code</h4>
+                    <p>Open any UPI app and scan this QR code to pay ₹1,299.00</p>
+                    <p style="margin-top: 10px; font-size: 14px; color: #666;">
+                        Works with Google Pay, PhonePe, Paytm, and other UPI apps
+                    </p>
+                </div>
+            </div>
+
+            <!-- Net Banking Details -->
+            <div class="payment-details" id="netbanking-details">
+                <h4>Select Your Bank</h4>
+                <div class="form-group">
+                    <label for="bank-select">Choose Bank</label>
+                    <select id="bank-select">
+                        <option value="">Select your bank</option>
+                        <option value="sbi">State Bank of India</option>
+                        <option value="hdfc">HDFC Bank</option>
+                        <option value="icici">ICICI Bank</option>
+                        <option value="axis">Axis Bank</option>
+                        <option value="kotak">Kotak Mahindra Bank</option>
+                        <option value="pnb">Punjab National Bank</option>
+                        <option value="bob">Bank of Baroda</option>
+                        <option value="canara">Canara Bank</option>
+                        <option value="union">Union Bank of India</option>
+                        <option value="other">Other Banks</option>
+                    </select>
+                </div>
+                <p style="font-size: 14px; color: #666;">
+                    You will be redirected to your bank's secure website to complete the payment.
+                </p>
+            </div>
+
+            <button class="pay-button" id="pay-btn" disabled>
+                Select Payment Method
+            </button>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Processing your payment...</p>
+            </div>
+
+            <div class="security-info">
+                <span>🔒</span>
+                <span>Your payment is secured with 256-bit SSL encryption</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedMethod = null;
+        let paymentData = {};
+
+        // Payment method selection
+        document.querySelectorAll('.payment-method').forEach(method => {
+            method.addEventListener('click', function() {
+                // Remove active class from all methods
+                document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('active'));
+                document.querySelectorAll('.payment-details').forEach(d => d.classList.remove('active'));
+                
+                // Add active class to selected method
+                this.classList.add('active');
+                selectedMethod = this.dataset.method;
+                
+                // Show corresponding details
+                const detailsElement = document.getElementById(`${selectedMethod}-details`);
+                if (detailsElement) {
+                    detailsElement.classList.add('active');
+                }
+                
+                updatePayButton();
+            });
+        });
+
+        // Form input handlers
+        document.getElementById('upi-id').addEventListener('input', function() {
+            paymentData.upiId = this.value;
+            updatePayButton();
+        });
+
+        document.getElementById('mobile').addEventListener('input', function() {
+            paymentData.mobile = this.value;
+            updatePayButton();
+        });
+
+        document.getElementById('bank-select').addEventListener('change', function() {
+            paymentData.bank = this.value;
+            updatePayButton();
+        });
+
+        function updatePayButton() {
+            const payBtn = document.getElementById('pay-btn');
+            let isValid = false;
+            let buttonText = 'Select Payment Method';
+
+            if (selectedMethod === 'upi') {
+                isValid = paymentData.upiId && paymentData.upiId.length > 0;
+                buttonText = isValid ? 'Pay ₹1,299 via UPI' : 'Enter UPI ID';
+            } else if (selectedMethod === 'qr') {
+                isValid = true;
+                buttonText = 'Waiting for QR Code Payment...';
+            } else if (selectedMethod === 'netbanking') {
+                isValid = paymentData.bank && paymentData.bank.length > 0;
+                buttonText = isValid ? 'Pay ₹1,299 via Net Banking' : 'Select Bank';
+            }
+
+            payBtn.disabled = !isValid;
+            payBtn.textContent = buttonText;
+        }
+
+        // Payment processing
+        document.getElementById('pay-btn').addEventListener('click', function() {
+            if (!selectedMethod) return;
+
+            const loadingDiv = document.getElementById('loading');
+            const paymentBody = document.querySelector('.payment-body');
+            
+            // Show loading
+            paymentBody.style.display = 'none';
+            loadingDiv.style.display = 'block';
+
+            // Simulate payment processing
+            setTimeout(() => {
+                loadingDiv.style.display = 'none';
+                paymentBody.style.display = 'block';
+                
+                // Show success message
+                alert(`Payment of ₹1,299 initiated successfully via ${selectedMethod.toUpperCase()}!\n\nTransaction ID: TXN${Math.random().toString(36).substr(2, 9).toUpperCase()}\n\nYou will receive a confirmation SMS shortly.`);
+            }, 3000);
+        });
+
+        // QR Code simulation - auto-refresh every 30 seconds
+        if (selectedMethod === 'qr') {
+            setInterval(() => {
+                const qrCode = document.querySelector('.qr-code');
+                if (qrCode && document.getElementById('qr-details').classList.contains('active')) {
+                    qrCode.style.transform = 'scale(0.9)';
+                    setTimeout(() => {
+                        qrCode.style.transform = 'scale(1)';
+                    }, 200);
+                }
+            }, 30000);
+        }
+
+        // Input validation
+        document.getElementById('upi-id').addEventListener('input', function() {
+            this.value = this.value.toLowerCase().replace(/[^a-z0-9@._-]/g, '');
+        });
+
+        document.getElementById('mobile').addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        // Auto-focus on UPI ID when UPI method is selected
+        document.querySelector('[data-method="upi"]').addEventListener('click', function() {
+            setTimeout(() => {
+                document.getElementById('upi-id').focus();
+            }, 100);
+        });
+    </script>
+</body>
+</html>

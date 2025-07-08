@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Enrollment - EduMaster</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .enrollment-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(31, 38, 135, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .enrollment-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c);
+            border-radius: 25px 25px 0 0;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 3px;
+        }
+
+        .form-step {
+            display: none;
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #2d3748;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-group input:valid,
+        .form-group select:valid {
+            border-color: #48bb78;
+        }
+
+        .form-group input:invalid:not(:placeholder-shown) {
+            border-color: #f56565;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0aec0;
+            font-size: 1.2rem;
+        }
+
+        .form-group.has-icon input {
+            padding-left: 50px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #48bb78, #38a169);
+            color: white;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(72, 187, 120, 0.4);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .summary-card {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #48bb78;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(72, 187, 120, 0.3);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: #f56565;
+            box-shadow: 0 10px 30px rgba(245, 101, 101, 0.3);
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #a0aec0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .step.completed {
+            background: #48bb78;
+            color: white;
+        }
+
+        .step-connector {
+            width: 40px;
+            height: 2px;
+            background: #e2e8f0;
+            transition: background 0.3s ease;
+        }
+
+        .step-connector.completed {
+            background: #48bb78;
+        }
+
+        @media (max-width: 768px) {
+            .enrollment-container {
+                padding: 25px;
+                margin: 10px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .step-indicator {
+                gap: 10px;
+            }
+
+            .step {
+                width: 30px;
+                height: 30px;
+                font-size: 0.9rem;
+            }
+
+            .step-connector {
+                width: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="enrollment-container">
+        <div class="header">
+            <h1>🎓 Student Enrollment</h1>
+            <p>Join thousands of successful students</p>
+        </div>
+
+        <div class="step-indicator">
+            <div class="step active" id="step-1">1</div>
+            <div class="step-connector" id="connector-1"></div>
+            <div class="step" id="step-2">2</div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+
+        <form id="enrollment-form">
+            <!-- Step 1: Personal Information -->
+            <div class="form-step active" id="form-step-1">
+                <h2 style="margin-bottom: 25px; color: #2d3748; text-align: center;">Personal Information</h2>
+                
+                <div class="form-group has-icon">
+                    <label for="student-name">Full Name *</label>
+                    <span class="input-icon">👤</span>
+                    <input type="text" id="student-name" name="studentName" required 
+                           placeholder="Enter your full name" minlength="2">
+                </div>
+
+                <div class="form-group has-icon">
+                    <label for="student-email">Email Address *</label>
+                    <span class="input-icon">📧</span>
+                    <input type="email" id="student-email" name="studentEmail" required 
+                           placeholder="Enter your email address">
+                </div>
+
+                <div class="form-group has-icon">
+                    <label for="student-phone">Contact Number *</label>
+                    <span class="input-icon">📱</span>
+                    <input type="tel" id="student-phone" name="studentPhone" required 
+                           placeholder="Enter your 10-digit phone number" pattern="[0-9]{10}" maxlength="10">
+                </div>
+
+                <div class="form-group">
+                    <label for="student-age">Age *</label>
+                    <input type="number" id="student-age" name="studentAge" required 
+                           placeholder="Enter your age" min="15" max="40">
+                </div>
+
+                <div class="form-group">
+                    <label for="student-education">Current Education Level *</label>
+                    <select id="student-education" name="studentEducation" required>
+                        <option value="">Select your education level</option>
+                        <option value="10th-class">10th Class</option>
+                        <option value="12th-class">12th Class</option>
+                        <option value="undergraduate">Undergraduate</option>
+                        <option value="graduate">Graduate</option>
+                        <option value="postgraduate">Post Graduate</option>
+                    </select>
+                </div>
+
+                <div class="button-group">
+                    <div></div>
+                    <button type="button" class="btn btn-primary" onclick="nextStep(1)">
+                        Review & Confirm
+                        <span class="loading-spinner" id="loading-1"></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Review & Confirmation -->
+            <div class="form-step" id="form-step-2">
+                <h2 style="margin-bottom: 25px; color: #2d3748; text-align: center;">Review Your Details</h2>
+                
+                <div class="summary-card" id="enrollment-summary">
+                    <!-- Summary will be populated by JavaScript -->
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="terms-checkbox" required style="margin-right: 10px;">
+                        I agree to the <a href="#" style="color: #667eea;">Terms and Conditions</a> and <a href="#" style="color: #667eea;">Privacy Policy</a>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="updates-checkbox" style="margin-right: 10px;">
+                        I want to receive updates about new courses and offers
+                    </label>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" onclick="prevStep(2)">Previous</button>
+                    <button type="button" class="btn btn-success" onclick="proceedToPayment()">
+                        Proceed to Payment
+                        <span class="loading-spinner" id="loading-submit"></span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        Form submitted successfully!
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let enrollmentData = {};
+
+        // Form validation
+        function validateStep(step) {
+            const currentStepElement = document.getElementById(`form-step-${step}`);
+            const requiredFields = currentStepElement.querySelectorAll('[required]');
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.style.borderColor = '#f56565';
+                    isValid = false;
+                } else {
+                    field.style.borderColor = '#48bb78';
+                }
+            });
+
+            // Special validation for phone number
+            if (step === 1) {
+                const phoneInput = document.getElementById('student-phone');
+                const phonePattern = /^[0-9]{10}$/;
+                if (!phonePattern.test(phoneInput.value)) {
+                    phoneInput.style.borderColor = '#f56565';
+                    showNotification('Please enter a valid 10-digit phone number', 'error');
+                    isValid = false;
+                }
+            }
+
+            return isValid;
+        }
+
+        function nextStep(step) {
+            if (!validateStep(step)) return;
+
+            // Show loading spinner
+            const loadingSpinner = document.getElementById(`loading-${step}`);
+            loadingSpinner.style.display = 'inline-block';
+
+            // Simulate loading delay
+            setTimeout(() => {
+                loadingSpinner.style.display = 'none';
+                
+                // Hide current step
+                document.getElementById(`form-step-${step}`).classList.remove('active');
+                
+                // Show next step
+                currentStep = step + 1;
+                document.getElementById(`form-step-${currentStep}`).classList.add('active');
+                
+                // Update progress
+                updateProgress();
+                updateStepIndicator();
+                
+                // Populate summary if moving to step 2
+                if (currentStep === 2) {
+                    populateSummary();
+                }
+                
+                // Smooth scroll to top
+                document.querySelector('.enrollment-container').scrollIntoView({ behavior: 'smooth' });
+            }, 800);
+        }
+
+        function prevStep(step) {
+            // Hide current step
+            document.getElementById(`form-step-${step}`).classList.remove('active');
+            
+            // Show previous step
+            currentStep = step - 1;
+            document.getElementById(`form-step-${currentStep}`).classList.add('active');
+            
+            // Update progress
+            updateProgress();
+            updateStepIndicator();
+            
+            // Smooth scroll to top
+            document.querySelector('.enrollment-container').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function updateProgress() {
+            const progressFill = document.getElementById('progress-fill');
+            const progressPercentage = (currentStep / 2) * 100;
+            progressFill.style.width = `${progressPercentage}%`;
+        }
+
+        function updateStepIndicator() {
+            for (let i = 1; i <= 2; i++) {
+                const step = document.getElementById(`step-${i}`);
+                const connector = document.getElementById(`connector-${i}`);
+                
+                if (i < currentStep) {
+                    step.classList.add('completed');
+                    step.classList.remove('active');
+                    step.innerHTML = '✓';
+                    if (connector) connector.classList.add('completed');
+                } else if (i === currentStep) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                    step.innerHTML = i;
+                } else {
+                    step.classList.remove('active', 'completed');
+                    step.innerHTML = i;
+                    if (connector) connector.classList.remove('completed');
+                }
+            }
+        }
+
+        function populateSummary() {
+            const name = document.getElementById('student-name').value;
+            const email = document.getElementById('student-email').value;
+            const phone = document.getElementById('student-phone').value;
+            const age = document.getElementById('student-age').value;
+            const education = document.getElementById('student-education').value;
+            
+            const summaryHTML = `
+                <div class="summary-row">
+                    <span><strong>Name:</strong></span>
+                    <span>${name}</span>
+                </div>
+                <div class="summary-row">
+                    <span><strong>Email:</strong></span>
+                    <span>${email}</span>
+                </div>
+                <div class="summary-row">
+                    <span><strong>Phone:</strong></span>
+                    <span>${phone}</span>
+                </div>
+                <div class="summary-row">
+                    <span><strong>Age:</strong></span>
+                    <span>${age} years</span>
+                </div>
+                <div class="summary-row">
+                    <span><strong>Education:</strong></span>
+                    <span>${education.replace('-', ' ').toUpperCase()}</span>
+                </div>
+            `;
+            
+            document.getElementById('enrollment-summary').innerHTML = summaryHTML;
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+       function proceedToPayment() {
+    if (!validateStep(2)) return;
+    
+    const loadingSpinner = document.getElementById('loading-submit');
+    loadingSpinner.style.display = 'inline-block';
+
+    setTimeout(() => {
+        loadingSpinner.style.display = 'none';
+        showNotification('🎉 Redirecting to secure payment...', 'success');
+
+        // Redirect to payment page
+        window.location.href = 'payment.html';
+    }, 1500);
+}
+
+
+        function resetForm() {
+            // Reset form
+            document.getElementById('enrollment-form').reset();
+            
+            // Reset to first step
+            document.querySelectorAll('.form-step').forEach(step => step.classList.remove('active'));
+            document.getElementById('form-step-1').classList.add('active');
+            currentStep = 1;
+            
+            // Reset progress and indicators
+            updateProgress();
+            updateStepIndicator();
+            
+            // Reset field styles
+            document.querySelectorAll('input, select').forEach(field => {
+                field.style.borderColor = '#e2e8f0';
+            });
+        }
+
+        // Phone number formatting
+        document.getElementById('student-phone').addEventListener('input', function(e) {
+            this.value = this.value.replace(/\D/g, '').substring(0, 10);
+        });
+
+        // Initialize
+        updateProgress();
+        updateStepIndicator();
+    </script>
+</body>
+</html>

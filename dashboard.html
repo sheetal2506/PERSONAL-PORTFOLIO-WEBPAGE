@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideDown 0.6s ease-out;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        .user-details h2 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .user-details p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .stats-overview {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 10px 20px;
+            background: rgba(116, 75, 162, 0.1);
+            border-radius: 12px;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #764ba2;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: white;
+        }
+
+        .grades-icon { background: #e74c3c; }
+        .schedule-icon { background: #3498db; }
+        .assignments-icon { background: #f39c12; }
+
+        .grade-item, .schedule-item, .assignment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #ecf0f1;
+            transition: background 0.3s ease;
+        }
+
+        .grade-item:hover, .schedule-item:hover, .assignment-item:hover {
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 8px;
+            padding-left: 10px;
+        }
+
+        .grade-item:last-child, .schedule-item:last-child, .assignment-item:last-child {
+            border-bottom: none;
+        }
+
+        .subject-name, .class-name, .assignment-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .grade {
+            font-weight: bold;
+            padding: 4px 12px;
+            border-radius: 20px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .grade-a { background: #27ae60; }
+        .grade-b { background: #f39c12; }
+        .grade-c { background: #e67e22; }
+
+        .time {
+            color: #7f8c8d;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .pending { background: #fff3cd; color: #856404; }
+        .completed { background: #d4edda; color: #155724; }
+        .overdue { background: #f8d7da; color: #721c24; }
+
+        .bottom-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+        }
+
+        .progress-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .progress-item {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #ecf0f1;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.8s ease;
+        }
+
+        .progress-math { background: linear-gradient(90deg, #ff6b6b, #ee5a52); }
+        .progress-science { background: linear-gradient(90deg, #4ecdc4, #44b3a5); }
+        .progress-english { background: linear-gradient(90deg, #ffe66d, #ffd93d); }
+
+        .quick-actions {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .action-btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+        }
+
+        .btn-tertiary {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .bottom-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .stats-overview {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Header Section -->
+        <div class="header">
+            <div class="user-info">
+                <div class="avatar">S</div>
+                <div class="user-details">
+                    <h2>Student</h2>
+                    
+                </div>
+            </div>
+            <div class="stats-overview">
+                <div class="stat-item">
+                    <div class="stat-number"89</div>
+                    <div class="stat-label">Marks</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">85%</div>
+                    <div class="stat-label">Attendance</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">subjects</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="main-content">
+            <!-- Recent Grades -->
+            <div class="card">
+                <h3>
+                    <span class="icon grades-icon">📊</span>
+                    Recent Grades
+                </h3>
+                <div class="grades-list">
+                    <div class="grade-item">
+                        <span class="subject-name">Mathematics</span>
+                        <span class="grade grade-a">76</span>
+                    </div>
+                    <div class="grade-item">
+                        <span class="subject-name">Chemistry</span>
+                        <span class="grade grade-a">89</span>
+                    </div>
+                    <div class="grade-item">
+                        <span class="subject-name">Physics</span>
+                        <span class="grade grade-b">60</span>
+                    </div>
+                    
+                </div>
+            </div>
+
+            <!-- Today's Schedule -->
+            <div class="card">
+                <h3>
+                    <span class="icon schedule-icon">📅</span>
+                    Today's Schedule
+                </h3>
+                <div class="schedule-list">
+                    <div class="schedule-item">
+                        <div>
+                            <div class="class-name">Mathematics</div>
+                            <div class="time">9:00 AM - 11:00 AM</div>
+                        </div>
+                    </div>
+                    <div class="schedule-item">
+                        <div>
+                            <div class="class-name">Chemistry</div>
+                            <div class="time">11:30 AM - 12:30 PM</div>
+                        </div>
+                    </div>
+                    <div class="schedule-item">
+                        <div>
+                            <div class="class-name">Physics</div>
+                            <div class="time">2:00 PM - 3:30 PM</div>
+                        </div>
+                    </div>
+                    <div class="schedule-item">
+                        <div>
+                            <div class="class-name">Study Group</div>
+                            <div class="time">4:00 PM - 5:30 PM</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upcoming Assignments -->
+            <div class="card">
+                <h3>
+                    <span class="icon assignments-icon">📝</span>
+                    Assignments
+                </h3>
+                <div class="assignments-list">
+                    <div class="assignment-item">
+                        <div>
+                            <div class="assignment-name">Mock Test</div>
+                            <div class="time">Due: Tomorrow</div>
+                        </div>
+                        <span class="status pending">Pending</span>
+                    </div>
+                    <div class="assignment-item">
+                        <div>
+                            <div class="assignment-name">DPP</div>
+                            <div class="time">Due: Dec 15</div>
+                        </div>
+                        <span class="status completed">Completed</span>
+                    </div>
+                    <div class="assignment-item">
+                        <div>
+                            <div class="assignment-name">PYQ's</div>
+                            <div class="time">Due: Dec 10</div>
+                        </div>
+                        <span class="status overdue">Overdue</span>
+                    </div>
+                    <div class="assignment-item">
+                        <div>
+                            <div class="assignment-name">Monthly Test</div>
+                            <div class="time">Due: Dec 20</div>
+                        </div>
+                        <span class="status pending">Pending</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Section -->
+        <div class="bottom-section">
+            <!-- Course Progress -->
+            <div class="progress-section">
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span><strong>Mathematics</strong></span>
+                        <span>87%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-math" style="width: 87%"></div>
+                    </div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span><strong>Chemistry</strong></span>
+                        <span>92%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-science" style="width: 92%"></div>
+                    </div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span><strong>Physics</strong></span>
+                        <span>78%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-english" style="width: 78%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <h3>Quick Actions</h3>
+                <button class="action-btn btn-primary" onclick="showNotification('Opening gradebook...')">
+                    View All Grades
+                </button>
+                <button class="action-btn btn-secondary" onclick="showNotification('Opening assignment submission...')">
+                    Submit DPP
+                </button>
+                <button class="action-btn btn-tertiary" onclick="showNotification('Opening class schedule...')">
+                    View Full Schedule
+                </button>
+                <button class="action-btn btn-primary" onclick="showNotification('Opening student profile...')">
+                    Edit Profile
+                </button>
+                <button class="action-btn btn-secondary" onclick="showNotification('Opening library portal...')">
+                    Library Resources
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add stagger animation to cards
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+
+            // Add click animations to grade items
+            const gradeItems = document.querySelectorAll('.grade-item');
+            gradeItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.98)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 150);
+                });
+            });
+
+            // Add hover effects to schedule items
+            const scheduleItems = document.querySelectorAll('.schedule-item');
+            scheduleItems.forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    this.style.background = 'rgba(52, 152, 219, 0.1)';
+                });
+                item.addEventListener('mouseleave', function() {
+                    this.style.background = 'transparent';
+                });
+            });
+
+            // Animate progress bars on load
+            setTimeout(() => {
+                const progressBars = document.querySelectorAll('.progress-fill');
+                progressBars.forEach(bar => {
+                    const width = bar.style.width;
+                    bar.style.width = '0%';
+                    setTimeout(() => {
+                        bar.style.width = width;
+                    }, 100);
+                });
+            }, 800);
+
+            // Add real-time clock
+            updateClock();
+            setInterval(updateClock, 1000);
+        });
+
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const dateString = now.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            // Update the header if there's a clock element (we can add one)
+            if (!document.querySelector('.current-time')) {
+                const userDetails = document.querySelector('.user-details');
+                const clockElement = document.createElement('p');
+                clockElement.className = 'current-time';
+                clockElement.style.fontSize = '12px';
+                clockElement.style.color = '#7f8c8d';
+                clockElement.style.marginTop = '5px';
+                userDetails.appendChild(clockElement);
+            }
+            
+            const clockElement = document.querySelector('.current-time');
+            if (clockElement) {
+                clockElement.textContent = `${dateString} • ${timeString}`;
+            }
+        }
+
+        function showNotification(message) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                color: white;
+                padding: 15px 25px;
+                border-radius: 10px;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+                z-index: 1000;
+                animation: slideInRight 0.3s ease-out;
+                font-weight: 600;
+            `;
+
+            // Add animation keyframes
+            if (!document.querySelector('#notification-styles')) {
+                const styles = document.createElement('style');
+                styles.id = 'notification-styles';
+                styles.textContent = `
+                    @keyframes slideInRight {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                    @keyframes slideOutRight {
+                        from { transform: translateX(0); opacity: 1; }
+                        to { transform: translateX(100%); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(styles);
+            }
+
+            document.body.appendChild(notification);
+
+            // Remove notification after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease-out';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Add click handlers for interactive elements
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('assignment-item')) {
+                const assignmentName = e.target.querySelector('.assignment-name').textContent;
+                showNotification(`Opening ${assignmentName}...`);
+            }
+            
+            if (e.target.classList.contains('schedule-item')) {
+                const className = e.target.querySelector('.class-name').textContent;
+                const time = e.target.querySelector('.time').textContent;
+                showNotification(`${className} - ${time}`);
+            }
+        });
+
+        // Add keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const notifications = document.querySelectorAll('[style*="position: fixed"]');
+                notifications.forEach(notification => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

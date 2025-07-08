@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduStream - Video Lectures</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #1e3c72 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            animation: pulse 2s infinite;
+        }
+
+        .logo h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-bar {
+            position: relative;
+        }
+
+        .search-bar input {
+            padding: 12px 45px 12px 20px;
+            border: 2px solid #e0e6ed;
+            border-radius: 25px;
+            width: 300px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: #4ecdc4;
+            box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(45deg, #4ecdc4, #44b3a5);
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
+            color: white;
+            font-size: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .user-menu {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .user-menu:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(118, 75, 162, 0.4);
+        }
+
+        /* Main Content Layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+        }
+
+        /* Video Player Section */
+        .video-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .video-player {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .video-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #2c3e50, #34495e);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-placeholder::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .play-button {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .play-button:hover {
+            transform: scale(1.1);
+            background: white;
+        }
+
+        .play-button::after {
+            content: '▶';
+            color: #2c3e50;
+            font-size: 24px;
+            margin-left: 5px;
+        }
+
+        .video-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            padding: 20px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .video-player:hover .video-controls {
+            transform: translateY(0);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #4ecdc4;
+            border-radius: 3px;
+            width: 35%;
+            transition: width 0.3s ease;
+        }
+
+        .control-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .control-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .time-display {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .lecture-info {
+            margin-top: 25px;
+        }
+
+        .lecture-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .lecture-meta {
+            display: flex;
+            gap: 20px;
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .lecture-description {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .lecture-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: linear-gradient(45deg, #4ecdc4, #44b3a5);
+            color: white;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sidebar-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            animation: fadeInRight 0.8s ease-out;
+        }
+
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .playlist-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            margin-bottom: 10px;
+        }
+
+        .playlist-item:hover {
+            background: rgba(78, 205, 196, 0.1);
+            border-color: #4ecdc4;
+            transform: translateX(5px);
+        }
+
+        .playlist-item.active {
+            background: linear-gradient(45deg, rgba(78, 205, 196, 0.1), rgba(68, 179, 165, 0.1));
+            border-color: #4ecdc4;
+        }
+
+        .playlist-thumbnail {
+            width: 60px;
+            height: 40px;
+            background: linear-gradient(45deg, #34495e, #2c3e50);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .playlist-info {
+            flex: 1;
+        }
+
+        .playlist-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            line-height: 1.3;
+        }
+
+        .playlist-duration {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+
+        .course-progress {
+            margin-top: 20px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .progress-text {
+            font-size: 14px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .progress-percentage {
+            font-size: 14px;
+            color: #4ecdc4;
+            font-weight: 700;
+        }
+
+        .course-progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e6ed;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .course-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ecdc4, #44b3a5);
+            border-radius: 10px;
+            width: 45%;
+            transition: width 0.8s ease;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            font-weight: 600;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                order: -1;
+            }
+            
+            .search-bar input {
+                width: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .header-actions {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .search-bar input {
+                width: 250px;
+            }
+            
+            .video-player {
+                height: 300px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+        }
+
+        /* Animations */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #4ecdc4, #44b3a5);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            animation: slideInRight 0.4s ease-out;
+            font-weight: 600;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">🎓</div>
+                <h1>EduStream</h1>
+            </div>
+            <div class="header-actions">
+                <div class="search-bar">
+                    <input type="text" placeholder="Search lectures, courses..." id="searchInput">
+                    <button class="search-btn" onclick="searchLectures()">🔍</button>
+                </div>
+                <button class="user-menu" onclick="showNotification('User menu opened')">My Account</button>
+            </div>
+        </header>
+
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Video Section -->
+            <main class="video-section">
+                <div class="video-player" id="videoPlayer">
+                    <div class="video-placeholder">
+                        <div class="play-button" onclick="playVideo()"></div>
+                        <p>Lecture 1</p>
+                        <p style="font-size: 14px; opacity: 0.7;">Click to play video</p>
+                    </div>
+                    <div class="video-controls">
+                        <div class="progress-bar" onclick="seekVideo(event)">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="control-buttons">
+                            <div class="btn-group">
+                                <button class="control-btn" onclick="togglePlay()" id="playPauseBtn">⏸️</button>
+                                <button class="control-btn" onclick="rewind()">⏪</button>
+                                <button class="control-btn" onclick="fastForward()">⏩</button>
+                                <button class="control-btn" onclick="toggleMute()" id="muteBtn">🔊</button>
+                            </div>
+                            <div class="time-display">
+                                <span id="currentTime">15:30</span> / <span id="totalTime">45:20</span>
+                            </div>
+                            <div class="btn-group">
+                                <button class="control-btn" onclick="changeSpeed()">1x</button>
+                                <button class="control-btn" onclick="toggleFullscreen()">⛶</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lecture-info">
+                    <h2 class="lecture-title" id="lectureTitle">Lecture 1</h2>
+                    <div class="lecture-meta">
+                        <span>👨‍🏫 Prof. Sarah Johnson</span>
+                        <span>📅 Dec 2024</span>
+                        <span>⏱️ 45 minutes</span>
+                        <span>👥 1,250 students</span>
+                    </div>
+                    <p class="lecture-description" id="lectureDescription">
+                        Learn the fundamental concepts 
+                    </p>
+                  
+                </div>
+            </main>
+
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <!-- Course Playlist -->
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        📚 Course Playlist
+                    </h3>
+                    <div class="playlist-item active" onclick="loadLecture(0)">
+                        <div class="playlist-thumbnail">1</div>
+                        <div class="playlist-info">
+                            <div class="playlist-title">Lecture 1</div>
+                            <div class="playlist-duration">45:20 • Currently playing</div>
+                        </div>
+                    </div>
+                    <div class="playlist-item" onclick="loadLecture(1)">
+                        <div class="playlist-thumbnail">2</div>
+                        <div class="playlist-info">
+                            <div class="playlist-title">Lecture 2</div>
+                            <div class="playlist-duration">38:15</div>
+                        </div>
+                    </div>
+                    <div class="playlist-item" onclick="loadLecture(2)">
+                        <div class="playlist-thumbnail">3</div>
+                        <div class="playlist-info">
+                            <div class="playlist-title">Lecture 3</div>
+                            <div class="playlist-duration">42:30</div>
+                        </div>
+                    </div>
+                    <div class="playlist-item" onclick="loadLecture(3)">
+                        <div class="playlist-thumbnail">4</div>
+                        <div class="playlist-info">
+                            <div class="playlist-title">Lecture 4</div>
+                            <div class="playlist-duration">35:45</div>
+                        </div>
+                    </div>
+                    <div class="playlist-item" onclick="loadLecture(4)">
+                        <div class="playlist-thumbnail">5</div>
+                        <div class="playlist-info">
+                            <div class="playlist-title">Lecture 5</div>
+                            <div class="playlist-duration">52:10</div>
+                        </div>
+                    </div>
+                    <div class="playlist-item" onclick="loadLecture(5)">
+                        <div class="playlist-thumbnail">6</div>
+                        <div class="playlist-info">
+                            <div class="playlist-title">Lecture 6</div>
+                            <div class="playlist-duration">40:25</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Course Progress -->
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        📊 Your Progress
+                    </h3>
+                    <div class="course-progress">
+                        <div class="progress-header">
+                            <span class="progress-text">Course Completion</span>
+                            <span class="progress-percentage">45%</span>
+                        </div>
+                        <div class="course-progress-bar">
+                            <div class="course-progress-fill"></div>
+                        </div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">3</div>
+                            <div class="stat-label">Completed</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">3</div>
+                            <div class="stat-label">Remaining</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">2.5</div>
+                            <div class="stat-label">Hours Watched</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">85%</div>
+                            <div class="stat-label">Quiz Score</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        ⚡ Quick Actions
+                    </h3>
+                    <button class="action-btn" onclick="downloadNotes()" style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 10px; background: linear-gradient(45deg, #667eea, #764ba2); color: white; font-weight: 600; cursor: pointer; transition: transform 0.3s ease;">
+                        📝 Download Notes
+                    </button>
+                    <button class="action-btn" onclick="takeQuiz()" style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 10px; background: linear-gradient(45deg, #ff6b6b, #ee5a52); color: white; font-weight: 600; cursor: pointer; transition: transform 0.3s ease;">
+                        📋 Take Quiz
+                    </button>
+                    <button class="action-btn" onclick="askQuestion()" style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 10px; background: linear-gradient(45deg, #4ecdc4, #44b3a5); color: white; font-weight: 600; cursor: pointer; transition: transform 0.3s ease;">
+                        ❓ Ask Question
+                    </button>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        // Lecture data
+        const lectures = [
+            {
+                title: "Introduction",
+                instructor: "Prof. Sarah Johnson",
+                duration: "45:20",
+                description: "Learn the fundamental concepts of data structures including arrays, linked lists, stacks, and queues. This lecture covers basic operations, time complexity analysis, and practical implementations.",
+                tags: ["Computer Science", "Data Structures", "Programming", "Algorithms"]
+            },
+            {
+                title: "Arrays and Dynamic Arrays",
+                instructor: "Prof. Sarah Johnson",
+                duration: "38:15",
+                description: "Deep dive into arrays and dynamic arrays. Learn about memory allocation, resizing strategies, and common operations with practical examples.",
+                tags: ["Arrays", "Memory", "Programming", "Implementation"]
+            },
+            {
+                title: "Linked Lists Implementation",
+                instructor: "Prof. Sarah Johnson",
+                duration: "42:30",
+                description: "Comprehensive guide to linked lists including singly linked lists, doubly linked lists, and circular linked lists with code examples.",
+                tags: ["Linked Lists", "Pointers", "Data Structures", "Implementation"]
+            },
+            {
+                title: "Stacks and Queues",
+                instructor: "Prof. Sarah Johnson",
+                duration: "35:45",
+                description: "Understanding stack and queue data structures, their operations, applications, and implementation using arrays and linked lists.",
+                tags: ["Stacks", "Queues", "LIFO", "FIFO"]
+            },
+            {
+                title: "Trees and Binary Search Trees",
+                instructor: "Prof. Sarah Johnson",
+                duration: "52:10",
+                description: "Introduction to tree data structures, binary trees, and binary search trees. Learn traversal algorithms and search operations.",
+                tags: ["Trees", "Binary Trees", "Search", "Traversal"]
+            },
+            {
+                title: "Hash Tables and Hashing",
+                instructor: "Prof. Sarah Johnson",
+                duration: "40:25",
+                description: "Learn about hash tables, hash functions, collision resolution techniques, and their practical applications in programming.",
+                tags: ["Hash Tables", "Hashing", "Collision Resolution", "Performance"]
+            }
+        ];
+
+        // Video player state
+        let isPlaying = false;
+        let isMuted = false;
+        let currentSpeed = 1;
+        let currentProgress = 35; // 35% progress
+        let currentLecture = 0;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLecture(0);
+            updateProgress();
+            
+            // Add hover effects to action buttons
+            const actionBtns = document.querySelectorAll('.action-btn');
+            actionBtns.forEach(btn => {
+                btn.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px)';
+                });
+                btn.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+
+            // Simulate video progress
+            setInterval(updateVideoProgress, 1000);
+        });
+
+        function loadLecture(index) {
+            currentLecture = index;
+            const lecture = lectures[index];
+            
+            // Update active playlist item
+            document.querySelectorAll('.playlist-item').forEach((item, i) => {
+                item.classList.toggle('active', i === index);
+            });
+            
+            // Update lecture info
+            document.getElementById('lectureTitle').textContent = lecture.title;
+            document.getElementById('lectureDescription').textContent = lecture.description;
+            document.querySelector('.lecture-meta').innerHTML = `
+                <span>👨‍🏫 ${lecture.instructor}</span>
+                <span>📅 Dec 2024</span>
+                <span>⏱️ ${lecture.duration}</span>
+                <span>👥 1,250 students</span>
+            `;
+            
+            // Update tags
+            const tagsContainer = document.querySelector('.lecture-tags');
+            tagsContainer.innerHTML = lecture.tags.map(tag => 
+                `<span class="tag">${tag}</span>`
+            ).join('');
+            
+            // Update video placeholder
+            const videoPlaceholder = document.querySelector('.video-placeholder p');
+            videoPlaceholder.textContent = lecture.title;
+            
+            // Reset video state
+            currentProgress = Math.random() * 100;
+            updateProgress();
+            
+            showNotification(`Loading: ${lecture.title}`);
+        }
+
+        function playVideo() {
+            isPlaying = true;
+            document.querySelector('.video-placeholder').style.display = 'none';
+            document.getElementById('playPauseBtn').textContent = '⏸️';
+            showNotification('Video started playing');
+        }
+
+        function togglePlay() {
+            isPlaying = !isPlaying;
+            document.getElementById('playPauseBtn').textContent = isPlaying ? '⏸️' : '▶️';
+            showNotification(isPlaying ? 'Video resumed' : 'Video paused');
+        }
+
+        function rewind() {
+            currentProgress = Math.max(0, currentProgress - 10);
+            updateProgress();
+            showNotification('Rewound 10 seconds');
+        }
+
+        function fastForward() {
+            currentProgress = Math.min(100, currentProgress + 10);
+            updateProgress();
+            showNotification('Fast forwarded 10 seconds');
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            document.getElementById('muteBtn').textContent = isMuted ? '🔇' : '🔊';
+            showNotification(isMuted ? 'Video muted' : 'Video unmuted');
+        }
+
+        function changeSpeed() {
+            const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
+            const currentIndex = speeds.indexOf(currentSpeed);
+            currentSpeed = speeds[(currentIndex + 1) % speeds.length];
+            event.target.textContent = `${currentSpeed}x`;
+            showNotification(`Playback speed: ${currentSpeed}x`);
+        }
+
+        function toggleFullscreen() {
+            showNotification('Fullscreen mode toggled');
+        }
+
+        function seekVideo(event
