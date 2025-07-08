@@ -65,4 +65,5 @@ This portfolio site demonstrates my skills not just in coding and UI design, but
 #Output
 
 <img width="1289" height="548" alt="Image" src="https://github.com/user-attachments/assets/e0773fe4-b92b-4c92-ae67-5a6a6e4d974a" />
+<img width="1196" height="523" alt="Image" src="https://github.com/user-attachments/assets/b0ee62a4-75b5-43b9-a64a-d0800998e409" />
 <img width="1283" height="567" alt="Image" src="https://github.com/user-attachments/assets/61f8a168-3164-4960-84e5-2f99c101d9fd" />
